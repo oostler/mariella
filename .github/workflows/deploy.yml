@@ -5,17 +5,21 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# The workflow token is not permitted to create the Pages site on this repo
+# (actions/configure-pages returns "Resource not accessible by integration"),
+# so we publish the built site to the gh-pages branch instead. Pages must be
+# pointed at that branch once, by hand:
+#   Settings -> Pages -> Source: "Deploy from a branch" -> gh-pages / (root)
+# After that one-time step every push to main redeploys automatically.
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,21 +29,8 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm run build
-      - name: Enable and configure Pages
-        uses: actions/configure-pages@v5
+      - name: Publish to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          enablement: true
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./dist
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist

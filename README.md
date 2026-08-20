@@ -26,6 +26,18 @@ Wooma is an AI-powered Hormone Intelligence Platform that transforms menstrual h
 - Mobile-first PWA-style web app (installable via the web manifest)
 - Deployed automatically to GitHub Pages via GitHub Actions on every push to `main`
 
+## Deployment: one-time Pages setup
+
+CI builds the site and publishes it to the `gh-pages` branch on every push to
+`main`. GitHub Pages itself has to be switched on once by hand — the workflow
+token is not allowed to create the Pages site (`actions/configure-pages` fails
+with *"Resource not accessible by integration"*).
+
+In the repo: **Settings → Pages → Build and deployment → Source:
+"Deploy from a branch"**, then pick branch **`gh-pages`** and folder **`/ (root)`**
+and save. The site goes live at https://oostler.github.io/mariella/ within a
+minute, and every later push to `main` redeploys on its own.
+
 ## Develop
 
 ```bash
